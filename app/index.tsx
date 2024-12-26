@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { View, Text } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import HomeScreen from '../components/HomeScreen';
-import ProfileScreen from '../components/ProfileScreen';
-import CalorieScreen from '../components/CalorieScreen';
+import HomeScreen from '../components/screens/HomeScreen';
+import ProfileScreen from '../components/screens/ProfileScreen';
+import CalorieScreen from '../components/screens/CalorieScreen';
 
 
 const Drawer = createDrawerNavigator();
