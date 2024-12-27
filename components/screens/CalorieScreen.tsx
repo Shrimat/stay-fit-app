@@ -7,11 +7,14 @@ import {
   SectionList,
   Text,
   Pressable,
+  SafeAreaView,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Button } from "@react-navigation/elements";
 import { WeekCalendar, CalendarProvider } from "react-native-calendars";
 import uuid from "react-native-uuid";
+
+const FOOD_URL = "https://world.openfoodfacts.org/api/v2/product"
 
 function CalorieScreen() {
   const navigation = useNavigation();
@@ -57,7 +60,7 @@ function CalorieScreen() {
       alert("Please enter a food name.");
       return;
     }
-    // setFoodData((prev) => [...prev, foodName]);
+    
     fetch("http://localhost:5000/food", {
       method: "POST",
       headers: {
@@ -98,7 +101,7 @@ function CalorieScreen() {
   console.log(foodData);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       {pressed ? (
         <View>
           <TextInput
@@ -112,8 +115,8 @@ function CalorieScreen() {
           <Button onPress={() => setPressed(false)}>Back</Button>
         </View>
       ) : (
-        <>
-          <View style={styles.container}>
+        <View style={styles.container}>
+          <View>
             <CalendarProvider
               onDateChanged={(date: string) => setDateSelected(date)}
               date={dateSelected}
@@ -121,13 +124,13 @@ function CalorieScreen() {
               <WeekCalendar firstDay={1} hideDayNames={false} />
             </CalendarProvider>
           </View>
-          <View style={styles.listContainer}>
+          <SafeAreaView style={{flex: 1}}>
             <SectionList
               sections={foodData}
               keyExtractor={(item, index) => item + index}
               renderItem={({ item }) => (
-                <View>
-                  <Text style={styles.title}>{item[1]}</Text>
+                <View style={styles.item}>
+                  <Text style={styles.itemText}>{item[1]}</Text>
                   <MaterialIcons
                     onPress={() => handleFoodDelete(item[0])}
                     name="delete"
@@ -136,26 +139,35 @@ function CalorieScreen() {
                   />
                 </View>
               )}
+              ItemSeparatorComponent={() => <View style={styles.separator} />}
+              SectionSeparatorComponent={() => <View style={styles.sectionSeparator} />}
               renderSectionHeader={({ section: { title } }) => (
-                <Text style={styles.header}>{title}</Text>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>{title}</Text>
+                </View>
               )}
               renderSectionFooter={({ section: { title } }) => (
-                <Pressable onPress={() => onPressNavigateToLogScreen(title)}>
-                  <Text>Log Food</Text>
-                </Pressable>
+                <View>
+                  <View style={styles.spacing} />
+                  <View style={[styles.footer, styles.sectionGap]}>
+                    <Pressable onPress={() => onPressNavigateToLogScreen(title)}>
+                      <Text style={styles.footerText}>Log {title}!</Text>
+                    </Pressable>
+                  </View>
+                </View>
               )}
+              stickySectionHeadersEnabled={true}
+              contentContainerStyle={styles.contentContainer}
             />
-          </View>
-        </>
+          </SafeAreaView>
+        </View>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  
   listContainer: {
     padding: 20,
     marginVertical: 8,
@@ -171,12 +183,66 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
   },
-  header: {
-    fontSize: 32,
-    backgroundColor: "#fff",
-  },
   title: {
     fontSize: 24,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  header: {
+    backgroundColor: '#6c757d',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  item: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    padding: 15,
+    marginHorizontal: 10,
+    marginVertical: 5,
+    borderRadius: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2, // For Android shadow
+  },
+  itemText: {
+    fontSize: 16,
+    color: '#212529',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#dee2e6',
+    marginHorizontal: 10,
+  },
+  footer: {
+    backgroundColor: '#e9ecef',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  footerText: {
+    fontSize: 14,
+    color: '#495057',
+  },
+  sectionSeparator: {
+    height: 20,
+  },
+  sectionGap: {
+    marginBottom: 20,
+  },
+  contentContainer: {
+    paddingBottom: 20,
+  },
+  spacing: {
+    height: 10, 
   },
 });
 
